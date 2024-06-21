@@ -1,0 +1,8 @@
+json: javascript object notation
+"npm init" + enter enter...enter (in terminal) to initiate
+opens package.json with pre-written contents
+
+type: module ==> uses import/export
+type: commonjs==> uses requires
+
+https://www.npmjs.com/
