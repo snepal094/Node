@@ -1,5 +1,5 @@
 {
-  "name": "crud-intro",
+  "name": "youtube",
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
@@ -13,6 +13,9 @@
   "description": "",
   "dependencies": {
     "express": "^4.19.2",
+    "mongoose": "^8.5.0"
+  },
+  "devDependencies": {
     "nodemon": "^3.1.4"
   }
 }
