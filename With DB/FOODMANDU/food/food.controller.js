@@ -1,7 +1,4 @@
 import express from "express";
-import Food from "./food.model.js";
-import Yup from "yup";
-import mongoose from "mongoose";
 import {
   validateFoodItemData,
   getFoodList,
