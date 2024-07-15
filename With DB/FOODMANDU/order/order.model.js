@@ -30,6 +30,15 @@ const orderSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+
+  customerEmail: {
+    type: String,
+    max: 100,
+  },
+  foodName: {
+    type: String,
+    max: 55,
+  },
 });
 
 //create table
