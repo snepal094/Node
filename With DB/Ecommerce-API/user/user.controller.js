@@ -5,7 +5,7 @@ import {
   loginUserValidationSchema,
   userValidationSchema,
 } from "./user.validation.js";
-import validateReqBody from "../middleware/authentication.middleware.js";
+import validateReqBody from "../middleware/validate.req.body.js";
 import jwt from "jsonwebtoken";
 
 const router = express.Router();
@@ -18,12 +18,12 @@ router.post(
     const data = req.body;
     // console.log(data);
 
-    //if validation fails, throw error
     try {
       //validate data
       const validatedData = await userValidationSchema.validate(data);
       req.body = validatedData;
     } catch (error) {
+      //if validation fails, throw error
       return res.status(400).send({ message: error.message });
     }
 
@@ -80,6 +80,7 @@ router.post(
     const plainPassword = loginCredentials.password;
     const hashedPassword = user.password;
     const isPasswordMatch = await bcrypt.compare(plainPassword, hashedPassword);
+
     //if password dosen't match, throw error
     if (!isPasswordMatch) {
       return res.status(404).send({ message: "Invalid Credentials." });
