@@ -1,7 +1,10 @@
 import Product from "./product.model.js";
 import express from "express";
 import validateReqBody from "../middleware/validate.req.body.js";
-import { addProductValidationSchema } from "./product.validation.js";
+import {
+  addProductValidationSchema,
+  paginationDataValidationSchema,
+} from "./product.validation.js";
 import { isSeller, isUser } from "../middleware/authentication.middleware.js";
 import validateMongoIdFromParams from "../middleware/validate.mongo.id.from.params.js";
 import checkMongoIdEquality from "../utils/mongo.id.equality.js";
@@ -118,6 +121,69 @@ router.put(
 
     //send response
     return res.status(200).send("Product edited Successfully.");
+  }
+);
+
+//* get product details
+router.get(
+  "/detail/:id",
+  isUser,
+  validateMongoIdFromParams,
+  async (req, res) => {
+    // extract product id from the req params
+    const productId = req.params.id;
+
+    // find product using product id
+    const product = await Product.findById(productId);
+    //product is in bson, .save() n all work here
+    //to convert to json: Product.findById(productId).lean()
+
+    // if not product throw error
+    if (!product) {
+      return res.status(404).send({ message: "Product not found" });
+    }
+
+    //send res
+    return res.status(200).send({ message: "success", productDetail: product });
+  }
+);
+
+//* list product by seller
+router.post(
+  "/seller/list",
+  isSeller,
+  validateReqBody(paginationDataValidationSchema),
+  async (req, res) => {
+    //extract pagination data from req.body
+    const { page, limit, searchText } = req.body;
+
+    //calculate skip
+    const skip = (page - 1) * limit;
+
+    //condition
+    let match = { sellerId: req.loggedInUserId };
+
+    if (searchText) {
+      match.name = { $regex: searchText, $options: "i" }; //i=case insensitive
+      //search by name
+    }
+
+    const products = await Product.aggregate([
+      { $match: match },
+      { $skip: skip },
+      { $limit: limit },
+      {
+        $project: {
+          name: 1,
+          price: 1,
+          brand: 1,
+          image: 1,
+          description: { $substr: ["$description", 0, 200] }, //$ because value, not field
+        },
+      },
+    ]);
+
+    return res.status(200).send({ message: "success", productList: products });
   }
 );
 
