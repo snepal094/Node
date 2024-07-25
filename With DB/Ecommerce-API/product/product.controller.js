@@ -5,7 +5,11 @@ import {
   addProductValidationSchema,
   paginationDataValidationSchema,
 } from "./product.validation.js";
-import { isSeller, isUser } from "../middleware/authentication.middleware.js";
+import {
+  isSeller,
+  isUser,
+  isBuyer,
+} from "../middleware/authentication.middleware.js";
 import validateMongoIdFromParams from "../middleware/validate.mongo.id.from.params.js";
 import checkMongoIdEquality from "../utils/mongo.id.equality.js";
 
@@ -168,6 +172,45 @@ router.post(
       //search by name
     }
 
+    const products = await Product.aggregate([
+      { $match: match },
+      { $skip: skip },
+      { $limit: limit },
+      {
+        $project: {
+          name: 1,
+          price: 1,
+          brand: 1,
+          image: 1,
+          description: { $substr: ["$description", 0, 200] }, //$ because value, not field
+        },
+      },
+    ]);
+
+    return res.status(200).send({ message: "success", productList: products });
+  }
+);
+
+//* list product by buyer
+router.post(
+  "/buyer/list",
+  isBuyer,
+  validateReqBody(paginationDataValidationSchema),
+  async (req, res) => {
+    //extract pagination data from req.body
+    const { page, limit, searchText } = req.body;
+
+    let match = {}; //no buyerId in table
+
+    if (searchText) {
+      match.name = { $regex: searchText, $options: "i" }; //i=case insensitive
+      //search by name
+    }
+
+    //calculate skip
+    const skip = (page - 1) * limit;
+
+    //find products
     const products = await Product.aggregate([
       { $match: match },
       { $skip: skip },
