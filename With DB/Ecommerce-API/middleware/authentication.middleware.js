@@ -1,16 +1,16 @@
-import jwt from "jsonwebtoken";
-import User from "../user/user.model.js";
+import jwt from 'jsonwebtoken';
+import User from '../user/user.model.js';
 
 export const isUser = async (req, res, next) => {
   //extract token from req.headers
   const { authorization } = req.headers;
-  const splittedArray = authorization?.split(" ");
+  const splittedArray = authorization?.split(' ');
   //\ ?=>authorization cha bhane matra split garne (error handling)
   const token = splittedArray?.length === 2 ? splittedArray[1] : null;
 
   //if not token, throw error
   if (!token) {
-    return res.status(400).send({ message: "Unauthorized." });
+    return res.status(400).send({ message: 'Unauthorized.' });
   }
 
   let payload; //afno scope ma nabhete afu bhanda baira ko scope lai refer garcha
@@ -20,7 +20,7 @@ export const isUser = async (req, res, next) => {
     payload = jwt.verify(token, secretKey);
   } catch (error) {
     //if decryption fails, throw error
-    return res.status(401).send({ message: "Unauthorized." });
+    return res.status(401).send({ message: 'Unauthorized.' });
   }
 
   //find user using email from payload
@@ -28,7 +28,7 @@ export const isUser = async (req, res, next) => {
 
   //if not user, throw error
   if (!user) {
-    return res.status(401).send({ message: "Unauthorized." });
+    return res.status(401).send({ message: 'Unauthorized.' });
   }
 
   req.loggedInUserId = user._id;
@@ -40,7 +40,7 @@ export const isSeller = async (req, res, next) => {
   try {
     //extract token from req.headers
     const { authorization } = req.headers;
-    const splittedArray = authorization?.split(" ");
+    const splittedArray = authorization?.split(' ');
     const token = splittedArray?.length === 2 ? splittedArray[1] : null;
 
     //if not token, throw error
@@ -52,6 +52,7 @@ export const isSeller = async (req, res, next) => {
 
     //verify token
     const payload = jwt.verify(token, secretKey);
+    // console.log('Decoded Payload:', payload);
 
     //find user using email from payload
     const user = await User.findOne({ email: payload.email });
@@ -62,7 +63,7 @@ export const isSeller = async (req, res, next) => {
     }
 
     // if user role is not seller, throw error
-    if (user.role !== "seller") {
+    if (user.role !== 'seller') {
       throw new Error();
     }
 
@@ -71,7 +72,7 @@ export const isSeller = async (req, res, next) => {
 
     next();
   } catch (error) {
-    return res.status(401).send({ message: "Unauthorized." });
+    return res.status(401).send({ message: 'Unauthorized.' });
   }
 };
 
@@ -79,13 +80,13 @@ export const isBuyer = async (req, res, next) => {
   // extract token from req.headers
   const { authorization } = req.headers;
 
-  const splittedArray = authorization?.split(" ");
+  const splittedArray = authorization?.split(' ');
 
   const token = splittedArray?.length === 2 ? splittedArray[1] : null;
 
   // if not token, throw error
   if (!token) {
-    return res.status(401).send({ message: "Unauthorized." });
+    return res.status(401).send({ message: 'Unauthorized.' });
   }
 
   let payload;
@@ -96,7 +97,7 @@ export const isBuyer = async (req, res, next) => {
     payload = jwt.verify(token, secretKey);
   } catch (error) {
     // if decryption fails, throw error
-    return res.status(401).send({ message: "Unauthorized." });
+    return res.status(401).send({ message: 'Unauthorized.' });
   }
 
   // find user using email from payload
@@ -104,11 +105,11 @@ export const isBuyer = async (req, res, next) => {
 
   // if not user, throw error
   if (!user) {
-    return res.status(401).send({ message: "Unauthorized." });
+    return res.status(401).send({ message: 'Unauthorized.' });
   }
 
-  if (user.role !== "buyer") {
-    return res.status(401).send({ message: "Unauthorized." });
+  if (user.role !== 'buyer') {
+    return res.status(401).send({ message: 'Unauthorized.' });
   }
 
   req.loggedInUserId = user._id;

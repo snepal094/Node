@@ -1,32 +1,32 @@
-import Product from "./product.model.js";
-import express from "express";
-import validateReqBody from "../middleware/validate.req.body.js";
+import Product from './product.model.js';
+import express from 'express';
+import validateReqBody from '../middleware/validate.req.body.js';
 import {
   addProductValidationSchema,
   paginationDataValidationSchema,
-} from "./product.validation.js";
+} from './product.validation.js';
 import {
   isSeller,
   isUser,
   isBuyer,
-} from "../middleware/authentication.middleware.js";
-import validateMongoIdFromParams from "../middleware/validate.mongo.id.from.params.js";
-import checkMongoIdEquality from "../utils/mongo.id.equality.js";
+} from '../middleware/authentication.middleware.js';
+import validateMongoIdFromParams from '../middleware/validate.mongo.id.from.params.js';
+import checkMongoIdEquality from '../utils/mongo.id.equality.js';
 
 const router = express.Router();
 
 //* list all products
-router.get("/list", isUser, async (req, res) => {
+router.get('/list', isUser, async (req, res) => {
   //find all products
   const products = await Product.find();
 
   //send response
-  return res.status(200).send({ message: "success", productList: products });
+  return res.status(200).send({ message: 'success', productList: products });
 });
 
 // * add product
 router.post(
-  "/add",
+  '/add',
   isSeller,
   validateReqBody(addProductValidationSchema),
   async (req, res) => {
@@ -35,17 +35,19 @@ router.post(
 
     newProduct.sellerId = req.loggedInUserId;
 
+    // console.log('Adding Product: Logged-in User ID:', req.loggedInUserId);
+
     // save product
     await Product.create(newProduct);
 
     // send res
-    return res.status(201).send({ message: "Product is added successfully." });
+    return res.status(201).send({ message: 'Product is added successfully.' });
   }
 );
 
 //*delete product
 router.delete(
-  "/delete/:id",
+  '/delete/:id',
   isSeller,
   validateMongoIdFromParams,
   async (req, res) => {
@@ -57,19 +59,21 @@ router.delete(
 
     //if product is not found, throw error
     if (!product) {
-      return res.status(404).send({ message: "Product does not exist." });
+      return res.status(404).send({ message: 'Product does not exist.' });
     }
 
     //check if loggedInUserId is the owner of the product
     const isProductOwner = checkMongoIdEquality(
       product.sellerId,
+      // console.log(product.sellerId),
       req.loggedInUserId
+      // console.log(req.loggedInUserId)
     );
 
     //if not owner, throw error
     if (!isProductOwner) {
       return res.status(403).send({
-        message: "You are not the owner of this product.",
+        message: 'You are not the owner of this product.',
       });
     }
 
@@ -77,13 +81,13 @@ router.delete(
     await Product.findByIdAndDelete(productId); //findByIdAndDelete: mongoose
 
     //send response
-    return res.status(200).send({ message: "Product deleted." });
+    return res.status(200).send({ message: 'Product deleted.' });
   }
 );
 
 //* edit product
 router.put(
-  "/edit/:id",
+  '/edit/:id',
   isSeller,
   validateMongoIdFromParams,
   validateReqBody(addProductValidationSchema),
@@ -96,7 +100,7 @@ router.put(
 
     //if not product, throw error
     if (!product) {
-      return res.status(404).send({ message: "Product does not exist." });
+      return res.status(404).send({ message: 'Product does not exist.' });
     }
 
     //check product ownership
@@ -109,7 +113,7 @@ router.put(
     if (!isProductOwner) {
       return res
         .status(403)
-        .send({ message: "You are not the owner of this product." });
+        .send({ message: 'You are not the owner of this product.' });
     }
 
     //extract new values from req.body
@@ -124,13 +128,13 @@ router.put(
     );
 
     //send response
-    return res.status(200).send("Product edited Successfully.");
+    return res.status(200).send('Product edited Successfully.');
   }
 );
 
 //* get product details
 router.get(
-  "/detail/:id",
+  '/detail/:id',
   isUser,
   validateMongoIdFromParams,
   async (req, res) => {
@@ -144,17 +148,17 @@ router.get(
 
     // if not product throw error
     if (!product) {
-      return res.status(404).send({ message: "Product not found" });
+      return res.status(404).send({ message: 'Product not found' });
     }
 
     //send res
-    return res.status(200).send({ message: "success", productDetail: product });
+    return res.status(200).send({ message: 'success', productDetail: product });
   }
 );
 
 //* list product by seller
 router.post(
-  "/seller/list",
+  '/seller/list',
   isSeller,
   validateReqBody(paginationDataValidationSchema),
   async (req, res) => {
@@ -168,7 +172,7 @@ router.post(
     let match = { sellerId: req.loggedInUserId };
 
     if (searchText) {
-      match.name = { $regex: searchText, $options: "i" }; //i=case insensitive
+      match.name = { $regex: searchText, $options: 'i' }; //i=case insensitive
       //search by name
     }
 
@@ -182,18 +186,18 @@ router.post(
           price: 1,
           brand: 1,
           image: 1,
-          description: { $substr: ["$description", 0, 200] }, //$ because value, not field
+          description: { $substr: ['$description', 0, 200] }, //$ because value, not field
         },
       },
     ]);
 
-    return res.status(200).send({ message: "success", productList: products });
+    return res.status(200).send({ message: 'success', productList: products });
   }
 );
 
 //* list product by buyer
 router.post(
-  "/buyer/list",
+  '/buyer/list',
   isBuyer,
   validateReqBody(paginationDataValidationSchema),
   async (req, res) => {
@@ -203,7 +207,7 @@ router.post(
     let match = {}; //no buyerId in table
 
     if (searchText) {
-      match.name = { $regex: searchText, $options: "i" }; //i=case insensitive
+      match.name = { $regex: searchText, $options: 'i' }; //i=case insensitive
       //search by name
     }
 
@@ -221,12 +225,12 @@ router.post(
           price: 1,
           brand: 1,
           image: 1,
-          description: { $substr: ["$description", 0, 200] }, //$ because value, not field
+          description: { $substr: ['$description', 0, 200] }, //$ because value, not field
         },
       },
     ]);
 
-    return res.status(200).send({ message: "success", productList: products });
+    return res.status(200).send({ message: 'success', productList: products });
   }
 );
 

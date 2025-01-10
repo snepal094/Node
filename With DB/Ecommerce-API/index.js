@@ -12,7 +12,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: '*',
+    origin: '*', //allow requests from all domains
   })
 );
 
