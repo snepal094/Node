@@ -3,7 +3,7 @@ export const productCategories = [
   'clothing',
   'cosmetics',
   'electrical',
-  'electronic',
+  'electronics',
   'fruits',
   'grocery',
   'gym',
@@ -14,7 +14,8 @@ export const productCategories = [
   'shoes',
   'sports',
   'stationery',
-  'vegetables'
+  'vegetables',
+  'others',
 ];
 
 export const DEFAULT_PAGE = 1;

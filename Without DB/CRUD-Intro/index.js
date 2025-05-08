@@ -1,4 +1,4 @@
-import express from "express";
+import express from 'express';
 
 const app = express();
 
@@ -8,18 +8,18 @@ app.use(express.json());
 let studentList = [
   {
     id: 1,
-    name: "Saugat",
+    name: 'Saugat',
   },
   {
     id: 2,
-    name: "Suyasha",
+    name: 'Suyasha',
   },
 ];
 
 //?API
 
 //add student
-app.post("/student/add", (req, res) => {
+app.post('/student/add', (req, res) => {
   //1st arg: request, 2nd: response
   //req, res are objects
   // console.log(req)
@@ -30,11 +30,11 @@ app.post("/student/add", (req, res) => {
   const newStudent = req.body; //postman-POST-get(/student/add)-body-raw
   studentList.push(newStudent);
   //response:
-  return res.status(200).send({ message: "Adding Student..." }); //can send anything: object, string, bool, whatever
+  return res.status(200).send({ message: 'Adding Student...' }); //can send anything: object, string, bool, whatever
 });
 
 //get studentList
-app.get("/student/list", (req, res) => {
+app.get('/student/list', (req, res) => {
   return res.status(200).send(studentList); //200 napathaye ni huncha (default)
 });
 

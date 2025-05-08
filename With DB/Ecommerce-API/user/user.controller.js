@@ -1,18 +1,18 @@
-import express from "express";
-import User from "./user.model.js";
-import bcrypt, { hash } from "bcrypt";
+import express from 'express';
+import User from './user.model.js';
+import bcrypt, { hash } from 'bcrypt';
 import {
   loginUserValidationSchema,
   userValidationSchema,
-} from "./user.validation.js";
-import validateReqBody from "../middleware/validate.req.body.js";
-import jwt from "jsonwebtoken";
+} from './user.validation.js';
+import validateReqBody from '../middleware/validate.req.body.js';
+import jwt from 'jsonwebtoken';
 
 const router = express.Router();
 
 //* register user
 router.post(
-  "/register",
+  '/register',
   async (req, res, next) => {
     //extract data from req.body
     const data = req.body;
@@ -40,7 +40,7 @@ router.post(
 
     //if user exists, throw error
     if (user) {
-      return res.status(401).send({ message: "User already exists." });
+      return res.status(401).send({ message: 'User already exists.' });
     }
 
     //hash password
@@ -55,14 +55,14 @@ router.post(
     await User.create(newUser);
 
     //send response
-    return res.status(201).send("User registered successfully.");
+    return res.status(201).send('User registered successfully.');
   }
 );
 
 //* login
 router.post(
   //get: req.body gets ignored completely
-  "/login",
+  '/login',
   validateReqBody(loginUserValidationSchema),
   async (req, res) => {
     //extract loginCredentials from req.body
@@ -73,7 +73,7 @@ router.post(
 
     //if not user, throw error
     if (!user) {
-      return res.status(400).send({ message: "Invalid Credentials." });
+      return res.status(400).send({ message: 'Invalid Credentials.' });
     }
 
     //compare password using bcrypt
@@ -83,7 +83,7 @@ router.post(
 
     //if password dosen't match, throw error
     if (!isPasswordMatch) {
-      return res.status(404).send({ message: "Invalid Credentials." });
+      return res.status(404).send({ message: 'Invalid Credentials.' });
     }
 
     //generate access token
@@ -95,7 +95,7 @@ router.post(
 
     //send response
     return res.status(200).send({
-      message: "Logged in successfully.",
+      message: 'Logged in successfully.',
       userDetails: user,
       accessToken: token,
     });
